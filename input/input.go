@@ -7,15 +7,15 @@ import (
 	"os"
 )
 
-func StartReading() <-chan *InputEventEnvelope {
-	inputC := make(chan *InputEventEnvelope)
+func StartReading() <-chan *EventEnvelope {
+	inputC := make(chan *EventEnvelope)
 
 	go func() {
 		defer close(inputC)
 
 		inputFile, err := openInputFile()
 		if err != nil {
-			inputC <- NewInputEventEnvelopeWithError(
+			inputC <- NewEventEnvelopeForError(
 				fmt.Errorf("error opening input file: %w", err))
 			return
 		}
@@ -23,12 +23,12 @@ func StartReading() <-chan *InputEventEnvelope {
 
 		scanner := bufio.NewScanner(inputFile)
 		for scanner.Scan() {
-			body := InputEvent(scanner.Text())
-			inputC <- NewInputEventEnvelopeWithBody(&body)
+			body := Event(scanner.Text())
+			inputC <- NewEventEnvelopeForBody(&body)
 		}
 
 		if err := scanner.Err(); err != nil {
-			inputC <- NewInputEventEnvelopeWithError(
+			inputC <- NewEventEnvelopeForError(
 				fmt.Errorf("error reading input file %s: %w", inputFile.Name(), err))
 			return
 		}

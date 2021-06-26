@@ -1,22 +1,22 @@
 package input
 
-type InputEvent string
+type Event string
 
-type InputEventEnvelope struct {
+type EventEnvelope struct {
 	Err error
 
 	// EXPLAIN: Why this is a pointer (for future compatibility, as the type can change and become meatier)
-	Body *InputEvent
+	Body *Event
 }
 
-func NewInputEventEnvelopeWithError(err error) *InputEventEnvelope {
-	return &InputEventEnvelope{
+func NewEventEnvelopeForError(err error) *EventEnvelope {
+	return &EventEnvelope{
 		Err: err,
 	}
 }
 
-func NewInputEventEnvelopeWithBody(inputEvent *InputEvent) *InputEventEnvelope {
-	return &InputEventEnvelope{
+func NewEventEnvelopeForBody(inputEvent *Event) *EventEnvelope {
+	return &EventEnvelope{
 		Body: inputEvent,
 	}
 }
