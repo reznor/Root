@@ -9,10 +9,10 @@ import (
 )
 
 type EventProcessor struct {
-	eventC <-chan *input.InputEventEnvelope
+	eventC <-chan *input.EventEnvelope
 }
 
-func New(eventC <-chan *input.InputEventEnvelope) *EventProcessor {
+func New(eventC <-chan *input.EventEnvelope) *EventProcessor {
 	return &EventProcessor{
 		eventC: eventC,
 	}
