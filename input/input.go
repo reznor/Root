@@ -15,7 +15,7 @@ func StartReading() <-chan *EventEnvelope {
 
 		inputFile, err := openInputFile()
 		if err != nil {
-			inputC <- NewEventEnvelopeForError(
+			inputC <- newEventEnvelopeForError(
 				fmt.Errorf("error opening input file: %w", err))
 			return
 		}
@@ -24,11 +24,11 @@ func StartReading() <-chan *EventEnvelope {
 		scanner := bufio.NewScanner(inputFile)
 		for scanner.Scan() {
 			body := Event(scanner.Text())
-			inputC <- NewEventEnvelopeForBody(&body)
+			inputC <- newEventEnvelopeForBody(&body)
 		}
 
 		if err := scanner.Err(); err != nil {
-			inputC <- NewEventEnvelopeForError(
+			inputC <- newEventEnvelopeForError(
 				fmt.Errorf("error reading input file %s: %w", inputFile.Name(), err))
 			return
 		}
