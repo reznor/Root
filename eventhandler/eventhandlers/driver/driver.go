@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"root.challenge/eventhandler"
+	"root.challenge/eventstore"
 )
 
 const driverEventType eventhandler.EventType = "Driver"
@@ -14,17 +15,16 @@ func init() {
 	eventhandler.RegisterEventHandler(driverEventType, &driverEventHandler{})
 }
 
-func (deh *driverEventHandler) CheckPreconditions(eventArgs eventhandler.EventArgs) error {
-	if len(eventArgs) == 0 {
-		return fmt.Errorf("XXX")
+func (deh *driverEventHandler) Handle(eventArgs eventhandler.EventArgs, eventStore *eventstore.EventStore) error {
+	if len(eventArgs) != 1 {
+		return fmt.Errorf("expecting exactly 1 arg (first name) to Driver event %v; got %d",
+			eventArgs, len(eventArgs))
 	}
 
-	return nil
-}
-
-func (deh *driverEventHandler) Handle(eventArgs eventhandler.EventArgs) error {
-	if len(eventArgs) == 0 {
-		return fmt.Errorf("XXX")
+	if err := eventStore.RegisterDriver(&eventstore.DriverInfo{
+		FirstName: eventArgs[0],
+	}); err != nil {
+		return fmt.Errorf("failed to register Driver event %v with EventStore: %w", eventArgs, err)
 	}
 
 	return nil

@@ -3,14 +3,15 @@ package eventhandler
 import (
 	"fmt"
 	"sync"
+
+	"root.challenge/eventstore"
 )
 
 type EventType string
 type EventArgs []string
 
 type EventHandler interface {
-	CheckPreconditions(eventArgs EventArgs) error
-	Handle(eventArgs EventArgs) error
+	Handle(eventArgs EventArgs, eventStore *eventstore.EventStore) error
 }
 
 var (
