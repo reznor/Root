@@ -11,9 +11,12 @@ import (
 
 func TestTripEventHandler(t *testing.T) {
 	tests := map[string]struct {
-		input       eventhandler.EventArgs
+		input eventhandler.EventArgs
+		// For when Handle() returns an error.
 		expectError bool
-		// expectedOutput is mutually exclusive with expectedError.
+		// For when the input is discarded.
+		expectNoOp bool
+		// expectedOutput is mutually exclusive with expectError and expectNoOp.
 		expectedOutput eventstore.VisitableEntity
 	}{
 		"TooFewArgs": {
@@ -24,6 +27,30 @@ func TestTripEventHandler(t *testing.T) {
 			input:       eventhandler.EventArgs{"DriverA", "01:00", "02:00", "25.5", "SomeUnwantedInfo"},
 			expectError: true,
 		},
+		"WronglyFormattedStartTime": {
+			input:       eventhandler.EventArgs{"DriverA", "01:00:45", "02:00", "25.5"},
+			expectError: true,
+		},
+		"WronglyFormattedStopTime": {
+			input:       eventhandler.EventArgs{"DriverA", "01:00", "02:00:45", "25.5"},
+			expectError: true,
+		},
+		"StartTimeNotBeforeStopTime": {
+			input:       eventhandler.EventArgs{"DriverA", "02:00", "01:00", "25.5"},
+			expectError: true,
+		},
+		"WronglyFormattedMileage": {
+			input:       eventhandler.EventArgs{"DriverA", "01:00", "02:00", "Ten"},
+			expectError: true,
+		},
+		"MileageFormattedAsInt": {
+			input: eventhandler.EventArgs{"DriverA", "01:00", "02:00", "25"},
+			expectedOutput: eventstore.VisitableEntity{
+				DriverFirstName:     "DriverA",
+				TotalDurationDriven: 1 * time.Hour,
+				TotalMilesDriven:    25.0,
+			},
+		},
 		"CorrectArgs": {
 			input: eventhandler.EventArgs{"DriverA", "01:00", "02:00", "25.5"},
 			expectedOutput: eventstore.VisitableEntity{
@@ -31,6 +58,14 @@ func TestTripEventHandler(t *testing.T) {
 				TotalDurationDriven: 1 * time.Hour,
 				TotalMilesDriven:    25.5,
 			},
+		},
+		"DiscardTripWithSpeedLessThan5Mph": {
+			input:      eventhandler.EventArgs{"DriverA", "01:00", "02:00", "4.9"},
+			expectNoOp: true,
+		},
+		"DiscardTripWithSpeedGreaterThan100Mph": {
+			input:      eventhandler.EventArgs{"DriverA", "01:00", "02:00", "100.1"},
+			expectNoOp: true,
 		},
 	}
 
@@ -52,7 +87,12 @@ func TestTripEventHandler(t *testing.T) {
 			r := eventstore.NewRecorder()
 			es.Visit(r)
 
-			if len(r.Entities) != 1 {
+			switch {
+			case len(r.Entities) == 0 && tc.expectNoOp:
+				return
+			case len(r.Entities) != 0 && tc.expectNoOp:
+				t.Fatalf("expected: 0 VisitableEntities in EventStore, got %#v", r.Entities)
+			case len(r.Entities) != 1:
 				t.Fatalf("expected exactly 1 VisitableEntity in EventStore, got %v", len(r.Entities))
 			}
 

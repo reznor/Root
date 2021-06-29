@@ -11,9 +11,10 @@ import (
 
 func TestDriverEventHandler(t *testing.T) {
 	tests := map[string]struct {
-		input       eventhandler.EventArgs
+		input eventhandler.EventArgs
+		// For when Handle() returns an error.
 		expectError bool
-		// expectedOutput is mutually exclusive with expectedError.
+		// expectedOutput is mutually exclusive with expectError.
 		expectedOutput eventstore.VisitableEntity
 	}{
 		"TooFewArgs": {
