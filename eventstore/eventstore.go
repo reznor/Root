@@ -5,7 +5,7 @@ import (
 )
 
 type driverSummary struct {
-	totalTimeDriven time.Duration
+	totalDurationDriven time.Duration
 	// EXPLAIN: This is a float64 because the corresponding field in TripInfo is a float32, and this avoids overflow.
 	totalMilesDriven float64
 }
@@ -56,7 +56,7 @@ func (es *EventStore) RecordTrip(tripInfo *TripInfo) error {
 	}
 
 	driverSummary.totalMilesDriven += float64(tripInfo.TripMileage)
-	driverSummary.totalTimeDriven += tripInfo.TripDuration
+	driverSummary.totalDurationDriven += tripInfo.TripDuration
 
 	return nil
 }
