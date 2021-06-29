@@ -24,6 +24,7 @@ func New() *EventStore {
 type DriverInfo struct {
 	FirstName string
 }
+
 type TripInfo struct {
 	DriverFirstName string
 	TripDuration    time.Duration
