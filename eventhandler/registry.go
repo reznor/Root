@@ -11,7 +11,7 @@ type EventType string
 type EventArgs []string
 
 type EventHandler interface {
-	Handle(eventArgs EventArgs, eventStore *eventstore.EventStore) error
+	Handle(EventArgs, *eventstore.EventStore) error
 }
 
 var (
