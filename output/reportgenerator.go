@@ -32,11 +32,11 @@ func (rg *ReportGenerator) Generate() GeneratedReport {
 
 		var averageSpeedDisplayStr string
 		if ve.TotalDurationDriven > 0 {
-			averageSpeedDisplayStr = fmt.Sprintf("@ %v mph", mathutils.RoundFloat64ToInt64(
+			averageSpeedDisplayStr = fmt.Sprintf(" @ %v mph", mathutils.RoundFloat64ToInt64(
 				mathutils.ComputeSpeedMph64(ve.TotalMilesDriven, ve.TotalDurationDriven)))
 		}
 
-		generatedReport = append(generatedReport, fmt.Sprintf("%s: %v miles %s",
+		generatedReport = append(generatedReport, fmt.Sprintf("%s: %v miles%s",
 			ve.DriverFirstName, mathutils.RoundFloat64ToInt64(ve.TotalMilesDriven), averageSpeedDisplayStr))
 	}
 
