@@ -7,6 +7,7 @@ import (
 
 	"root.challenge/eventhandler"
 	"root.challenge/eventstore"
+	"root.challenge/mathutils"
 )
 
 const tripEventType eventhandler.EventType = "Trip"
@@ -83,7 +84,7 @@ func computeTripMileage(tripMileageStr string) (float32, error) {
 }
 
 func isUsableTripSample(tripMileage float32, tripDuration time.Duration) bool {
-	tripSpeedMph := tripMileage / (float32(tripDuration) / float32(time.Hour))
+	tripSpeedMph := mathutils.ComputeSpeedMph32(tripMileage, tripDuration)
 
 	if tripSpeedMph < 5.0 || tripSpeedMph > 100.0 {
 		return false
