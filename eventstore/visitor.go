@@ -11,11 +11,11 @@ type VisitableEntity struct {
 	TotalMilesDriven    float64
 }
 
-type Visitor interface {
+type VisitorInterface interface {
 	Visit(*VisitableEntity)
 }
 
-func (es *EventStore) Visit(visitor Visitor) {
+func (es *EventStore) Visit(visitor VisitorInterface) {
 	for driverFirstName, driverSummary := range es.driverSummaries {
 		visitor.Visit(&VisitableEntity{
 			DriverFirstName:     driverFirstName,
