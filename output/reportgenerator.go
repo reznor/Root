@@ -3,7 +3,6 @@ package output
 import (
 	"container/heap"
 	"fmt"
-	"log"
 
 	"root.challenge/eventstore"
 	"root.challenge/mathutils"
@@ -23,7 +22,11 @@ func NewReportGenerator() *ReportGenerator {
 	return rg
 }
 
-func (rg *ReportGenerator) Generate() {
+type GeneratedReport []string
+
+func (rg *ReportGenerator) Generate() GeneratedReport {
+	generatedReport := make(GeneratedReport, 0)
+
 	for len(rg.heapElements) > 0 {
 		ve := heap.Pop(rg).(*eventstore.VisitableEntity)
 
@@ -33,9 +36,11 @@ func (rg *ReportGenerator) Generate() {
 				mathutils.ComputeSpeedMph64(ve.TotalMilesDriven, ve.TotalDurationDriven)))
 		}
 
-		log.Printf("%s: %v miles %s\n", ve.DriverFirstName,
-			mathutils.RoundFloat64ToInt64(ve.TotalMilesDriven), averageSpeedDisplayStr)
+		generatedReport = append(generatedReport, fmt.Sprintf("%s: %v miles %s",
+			ve.DriverFirstName, mathutils.RoundFloat64ToInt64(ve.TotalMilesDriven), averageSpeedDisplayStr))
 	}
+
+	return generatedReport
 }
 
 // Conforms to eventstore.Visitor.

@@ -18,9 +18,9 @@ func main() {
 
 	eventStore.Visit(eventstore.Printer{})
 
-	log.Printf("\nXXX\n")
-
 	reportGenerator := output.NewReportGenerator()
 	eventStore.Visit(reportGenerator)
-	reportGenerator.Generate()
+	for _, reportEntry := range reportGenerator.Generate() {
+		log.Println(reportEntry)
+	}
 }
