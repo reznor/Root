@@ -3,7 +3,6 @@ package input
 import (
 	"bufio"
 	"fmt"
-	"log"
 	"os"
 )
 
@@ -32,8 +31,6 @@ func StartReading() <-chan *EventEnvelope {
 				fmt.Errorf("error reading input file %s: %w", inputFile.Name(), err))
 			return
 		}
-
-		log.Printf("Finished reading input file %s", inputFile.Name())
 	}()
 
 	return inputC
