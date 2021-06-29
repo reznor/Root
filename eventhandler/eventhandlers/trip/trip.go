@@ -10,15 +10,15 @@ import (
 	"root.challenge/mathutils"
 )
 
-const tripEventType eventhandler.EventType = "Trip"
+const eventType eventhandler.EventType = "Trip"
 
-type tripEventHandler struct{}
+type EventHandler struct{}
 
 func init() {
-	eventhandler.RegisterEventHandler(tripEventType, &tripEventHandler{})
+	eventhandler.RegisterEventHandler(eventType, &EventHandler{})
 }
 
-func (teh *tripEventHandler) Handle(eventArgs eventhandler.EventArgs, eventStore *eventstore.EventStore) error {
+func (eh *EventHandler) Handle(eventArgs eventhandler.EventArgs, eventStore *eventstore.EventStore) error {
 	if len(eventArgs) != 4 {
 		return fmt.Errorf(
 			"expecting exactly 4 args (first name, start time, stop time, miles driven) to Trip event %v; got %d",
