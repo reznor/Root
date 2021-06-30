@@ -10,16 +10,16 @@ import (
 type EventType string
 type EventArgs []string
 
-type EventHandlerInterface interface {
+type Interface interface {
 	Handle(EventArgs, *eventstore.EventStore) error
 }
 
 var (
 	registryMu sync.RWMutex
-	registry   = make(map[EventType]EventHandlerInterface)
+	registry   = make(map[EventType]Interface)
 )
 
-func RegisterEventHandler(eventType EventType, eventHandler EventHandlerInterface) {
+func RegisterEventHandler(eventType EventType, eventHandler Interface) {
 	registryMu.Lock()
 	defer registryMu.Unlock()
 
@@ -34,7 +34,7 @@ func RegisterEventHandler(eventType EventType, eventHandler EventHandlerInterfac
 	registry[eventType] = eventHandler
 }
 
-func GetHandlerForEvent(eventType EventType) (EventHandlerInterface, error) {
+func GetHandlerForEvent(eventType EventType) (Interface, error) {
 	registryMu.RLock()
 	eventHandler, ok := registry[eventType]
 	registryMu.RUnlock()
