@@ -9,13 +9,13 @@ type EventEnvelope struct {
 	Body *Event
 }
 
-func newEventEnvelopeForError(err error) *EventEnvelope {
+func NewEventEnvelopeForError(err error) *EventEnvelope {
 	return &EventEnvelope{
 		Err: err,
 	}
 }
 
-func newEventEnvelopeForBody(inputEvent *Event) *EventEnvelope {
+func NewEventEnvelopeForBody(inputEvent *Event) *EventEnvelope {
 	return &EventEnvelope{
 		Body: inputEvent,
 	}
