@@ -28,7 +28,7 @@ func (ep *EventProcessor) Process(eventC <-chan *input.EventEnvelope, eventStore
 				errC <- fmt.Errorf("error retrieving next event from channel: %w", inputEventEnvelope.Err)
 				// EXPLAIN: Choose to stop all processing instead of using `continue` to follow the principle of fail-early-fail-hard; better to not mess up any state once the input stream has gotten into an error state, but this constraint can change as the requirements/functionality changes.
 				// TODO: Consider making this a continue as well? Check to see when all the channel is closed, and what kinds of errors are emitted over it.
-				break
+				continue
 			}
 
 			// Now that there's no infrastructural error in retrieving the event itself, it's alright to skip over
