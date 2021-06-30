@@ -40,11 +40,6 @@ func (teh *testEventHandler) teardown() {
 	teh.handleShouldReturnError = false
 }
 
-func createInputEventFromString(s string) *input.Event {
-	e := input.Event(s)
-	return &e
-}
-
 func TestTripEventHandler(t *testing.T) {
 	tests := map[string]struct {
 		input                   []*input.EventEnvelope
@@ -59,15 +54,15 @@ func TestTripEventHandler(t *testing.T) {
 		},
 		"InputWithEmptyLines": {
 			input: []*input.EventEnvelope{
-				input.NewEventEnvelopeForBody(createInputEventFromString("                  ")),
-				input.NewEventEnvelopeForBody(createInputEventFromString("    ")),
-				input.NewEventEnvelopeForBody(createInputEventFromString("            ")),
+				input.NewEventEnvelopeForBody(input.NewEventFromString("                  ")),
+				input.NewEventEnvelopeForBody(input.NewEventFromString("    ")),
+				input.NewEventEnvelopeForBody(input.NewEventFromString("            ")),
 			},
 			expectedOutput: []eventhandler.EventArgs{},
 		},
 		"SingleEventWithBody": {
 			input: []*input.EventEnvelope{
-				input.NewEventEnvelopeForBody(createInputEventFromString("TestEvent TestEvent1Arg1")),
+				input.NewEventEnvelopeForBody(input.NewEventFromString("TestEvent TestEvent1Arg1")),
 			},
 			expectedOutput: []eventhandler.EventArgs{
 				{"TestEvent1Arg1"},
@@ -75,8 +70,8 @@ func TestTripEventHandler(t *testing.T) {
 		},
 		"MultipleEventsWithBody": {
 			input: []*input.EventEnvelope{
-				input.NewEventEnvelopeForBody(createInputEventFromString("TestEvent TestEvent1Arg1")),
-				input.NewEventEnvelopeForBody(createInputEventFromString("TestEvent TestEvent2Arg1")),
+				input.NewEventEnvelopeForBody(input.NewEventFromString("TestEvent TestEvent1Arg1")),
+				input.NewEventEnvelopeForBody(input.NewEventFromString("TestEvent TestEvent2Arg1")),
 			},
 			expectedOutput: []eventhandler.EventArgs{
 				{"TestEvent1Arg1"},
@@ -85,7 +80,7 @@ func TestTripEventHandler(t *testing.T) {
 		},
 		"EventWithMultipleArgs": {
 			input: []*input.EventEnvelope{
-				input.NewEventEnvelopeForBody(createInputEventFromString("TestEvent TestEvent1Arg1 TestEvent1Arg2")),
+				input.NewEventEnvelopeForBody(input.NewEventFromString("TestEvent TestEvent1Arg1 TestEvent1Arg2")),
 			},
 			expectedOutput: []eventhandler.EventArgs{
 				{"TestEvent1Arg1", "TestEvent1Arg2"},
@@ -93,14 +88,14 @@ func TestTripEventHandler(t *testing.T) {
 		},
 		"UnrecognizedEvent": {
 			input: []*input.EventEnvelope{
-				input.NewEventEnvelopeForBody(createInputEventFromString("UnrecognizedEvent Arg1")),
+				input.NewEventEnvelopeForBody(input.NewEventFromString("UnrecognizedEvent Arg1")),
 			},
 			numExpectedErrors: 1,
 			expectedOutput:    []eventhandler.EventArgs{},
 		},
 		"HandleReturnsError": {
 			input: []*input.EventEnvelope{
-				input.NewEventEnvelopeForBody(createInputEventFromString("TestEvent TestEvent1Arg1")),
+				input.NewEventEnvelopeForBody(input.NewEventFromString("TestEvent TestEvent1Arg1")),
 			},
 			handleShouldReturnError: true,
 			numExpectedErrors:       1,
@@ -122,12 +117,12 @@ func TestTripEventHandler(t *testing.T) {
 		},
 		"MixOfAllEvents": {
 			input: []*input.EventEnvelope{
-				input.NewEventEnvelopeForBody(createInputEventFromString("TestEvent TestEvent1Arg1 TestEvent1Arg2")),
+				input.NewEventEnvelopeForBody(input.NewEventFromString("TestEvent TestEvent1Arg1 TestEvent1Arg2")),
 				{},
 				input.NewEventEnvelopeForError(fmt.Errorf("Some input error.")),
-				input.NewEventEnvelopeForBody(createInputEventFromString("                            ")),
-				input.NewEventEnvelopeForBody(createInputEventFromString("TestEvent TestEvent2Arg1 TestEvent2Arg2")),
-				input.NewEventEnvelopeForBody(createInputEventFromString("UnrecognizedEvent Arg1")),
+				input.NewEventEnvelopeForBody(input.NewEventFromString("                            ")),
+				input.NewEventEnvelopeForBody(input.NewEventFromString("TestEvent TestEvent2Arg1 TestEvent2Arg2")),
+				input.NewEventEnvelopeForBody(input.NewEventFromString("UnrecognizedEvent Arg1")),
 			},
 			numExpectedErrors: 3,
 			expectedOutput: []eventhandler.EventArgs{
