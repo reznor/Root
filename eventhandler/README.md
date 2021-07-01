@@ -12,4 +12,4 @@ refactoring) while still retaining the option of completely different test patte
 
 2. Remember to call `eventhandler.GlobalRegistry().RegisterEventHandler()` in your new package's `init`() function.
 
-3. Remember to actually load your new package into the system by importing your package anonymously in [eventprocessor.go](../eventprocessor/eventprocessor.go)].
+3. Remember to actually load your new package into the system by importing your package anonymously in [eventprocessor.go](../eventprocessor/eventprocessor.go).
