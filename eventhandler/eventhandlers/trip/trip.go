@@ -12,12 +12,16 @@ import (
 
 const eventType eventhandler.EventType = "Trip"
 
+// EventHandler is an implementation of `eventhandler.Interface` for the "Trip" EventType.
 type EventHandler struct{}
 
 func init() {
-	eventhandler.RegisterEventHandler(eventType, &EventHandler{})
+	if err := eventhandler.GlobalRegistry().RegisterEventHandler(eventType, &EventHandler{}); err != nil {
+		panic(err)
+	}
 }
 
+// Conforms to `eventhandler.Interface`.
 func (eh *EventHandler) Handle(eventArgs eventhandler.EventArgs, eventStore *eventstore.EventStore) error {
 	if len(eventArgs) != 4 {
 		return fmt.Errorf(
@@ -86,6 +90,7 @@ func computeTripMileage(tripMileageStr string) (float32, error) {
 func isUsableTripSample(tripMileage float32, tripDuration time.Duration) bool {
 	tripSpeedMph := mathutils.ComputeSpeedMph32(tripMileage, tripDuration)
 
+	// Speeds < 5mph or > 100mph are considered too anomalous to use in our dataset.
 	if tripSpeedMph < 5.0 || tripSpeedMph > 100.0 {
 		return false
 	}

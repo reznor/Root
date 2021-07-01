@@ -12,9 +12,9 @@ import (
 func TestDriverEventHandler(t *testing.T) {
 	tests := map[string]struct {
 		input eventhandler.EventArgs
-		// For when Handle() returns an error.
+		// For when `Handle`() returns an error.
 		expectError bool
-		// expectedOutput is mutually exclusive with expectError.
+		// `expectedOutput` is mutually exclusive with `expectError`.
 		expectedOutput eventstore.VisitableEntity
 	}{
 		"TooFewArgs": {
@@ -42,11 +42,11 @@ func TestDriverEventHandler(t *testing.T) {
 
 			err := deh.Handle(tc.input, es)
 			switch {
-			case err != nil && tc.expectError:
+			case tc.expectError && err != nil:
 				return
-			case err != nil && !tc.expectError:
+			case !tc.expectError && err != nil:
 				t.Fatalf("expected: no error, got: %v", err)
-			case err == nil && tc.expectError:
+			case tc.expectError && err == nil:
 				t.Fatalf("expected: error, got: no error")
 			}
 

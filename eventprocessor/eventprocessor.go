@@ -57,7 +57,7 @@ func (ep *EventProcessor) Process(eventC <-chan *input.EventEnvelope, eventStore
 			eventType := eventhandler.EventType(parsedEvent[0])
 			eventArgs := eventhandler.EventArgs(parsedEvent[1:])
 
-			eventHandler, err := eventhandler.GetHandlerForEvent(eventType)
+			eventHandler, err := eventhandler.GlobalRegistry().GetHandlerForEvent(eventType)
 			if err != nil {
 				errC <- fmt.Errorf("error retrieving handler for eventType %s: %w", eventType, err)
 				continue

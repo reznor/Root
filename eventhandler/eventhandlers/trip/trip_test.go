@@ -12,11 +12,11 @@ import (
 func TestTripEventHandler(t *testing.T) {
 	tests := map[string]struct {
 		input eventhandler.EventArgs
-		// For when Handle() returns an error.
+		// For when `Handle`() returns an error.
 		expectError bool
-		// For when the input is discarded.
+		// For when the event is discarded.
 		expectNoOp bool
-		// expectedOutput is mutually exclusive with expectError and expectNoOp.
+		// `expectedOutput` is mutually exclusive with `expectError` and `expectNoOp`.
 		expectedOutput eventstore.VisitableEntity
 	}{
 		"TooFewArgs": {
@@ -37,6 +37,10 @@ func TestTripEventHandler(t *testing.T) {
 		},
 		"StartTimeNotBeforeStopTime": {
 			input:       eventhandler.EventArgs{"DriverA", "02:00", "01:00", "25.5"},
+			expectError: true,
+		},
+		"StartTimeSameAsStopTime": {
+			input:       eventhandler.EventArgs{"DriverA", "01:00", "01:00", "25.5"},
 			expectError: true,
 		},
 		"WronglyFormattedMileage": {
@@ -76,23 +80,26 @@ func TestTripEventHandler(t *testing.T) {
 
 			err := teh.Handle(tc.input, es)
 			switch {
-			case err != nil && tc.expectError:
+			case tc.expectError && err != nil:
 				return
-			case err != nil && !tc.expectError:
+			case !tc.expectError && err != nil:
 				t.Fatalf("expected: no error, got: %v", err)
-			case err == nil && tc.expectError:
+			case tc.expectError && err == nil:
 				t.Fatalf("expected: error, got: no error")
 			}
 
 			r := eventstore.NewRecorder()
 			es.Visit(r)
 
-			switch {
-			case len(r.Entities) == 0 && tc.expectNoOp:
-				return
-			case len(r.Entities) != 0 && tc.expectNoOp:
-				t.Fatalf("expected: 0 VisitableEntities in EventStore, got %#v", r.Entities)
-			case len(r.Entities) != 1:
+			if tc.expectNoOp {
+				if len(r.Entities) == 0 {
+					return
+				} else {
+					t.Fatalf("expected: 0 VisitableEntities in EventStore, got %#v", r.Entities)
+				}
+			}
+
+			if len(r.Entities) != 1 {
 				t.Fatalf("expected exactly 1 VisitableEntity in EventStore, got %v", len(r.Entities))
 			}
 

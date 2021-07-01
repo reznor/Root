@@ -137,7 +137,7 @@ func TestTripEventHandler(t *testing.T) {
 	// Register `testEventHandler` one time for the entire test case, akin to how packages are initialized exactly
 	// once at load time.
 	teh := &testEventHandler{}
-	eventhandler.RegisterEventHandler(testEventType, teh)
+	eventhandler.GlobalRegistry().RegisterEventHandler(testEventType, teh)
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
