@@ -9,6 +9,12 @@ import (
 	"root.challenge/eventstore"
 )
 
+// `eventStoreMethodInvoker` and `eventStoreMethodInvocation` together provide a framework to invoke methods
+// on `EventStore` in the declarative manner used by `TestEventStore`.
+//
+// As new public methods are exposed on `EventStore`, add corresponding new `*Invoker` functions to the list
+// below.
+
 type eventStoreMethodInvoker func(eventStore *eventstore.EventStore, methodParams interface{}) error
 
 func registerDriverInvoker(eventStore *eventstore.EventStore, driverInfo interface{}) error {
