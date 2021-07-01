@@ -27,7 +27,7 @@ func main() {
 	reportGenerator := output.NewReportGenerator()
 	eventStore.Visit(reportGenerator)
 	for _, reportEntry := range reportGenerator.Generate() {
-		log.Println(reportEntry)
+		fmt.Println(reportEntry)
 	}
 }
 
