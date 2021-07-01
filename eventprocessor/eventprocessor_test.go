@@ -13,7 +13,7 @@ import (
 
 const testEventType eventhandler.EventType = "TestEvent"
 
-// testEventHandler is an implementation of eventhandler.Interface useful for tests because its
+// `testEventHandler` is an implementation of `eventhandler.Interface` useful for tests because its
 // behavior can be controlled, and its invocations can be inspected.
 type testEventHandler struct {
 	handleShouldReturnError bool
@@ -30,11 +30,13 @@ func (teh *testEventHandler) Handle(eventArgs eventhandler.EventArgs, eventStore
 	return nil
 }
 
+// Configure and initialize `testEventHandler` before another round of tests commences.
 func (teh *testEventHandler) setup(handleShouldReturnError bool) {
 	teh.handleShouldReturnError = handleShouldReturnError
 	teh.recordedEventArgs = make([]eventhandler.EventArgs, 0)
 }
 
+// Return `testEventHandler` to a pristine state after a round of tests completes.
 func (teh *testEventHandler) teardown() {
 	teh.recordedEventArgs = nil
 	teh.handleShouldReturnError = false
@@ -44,7 +46,7 @@ func TestTripEventHandler(t *testing.T) {
 	tests := map[string]struct {
 		input                   []*input.EventEnvelope
 		handleShouldReturnError bool
-		// For when Process() returns errors.
+		// For when `Process`() returns errors.
 		numExpectedErrors int
 		expectedOutput    []eventhandler.EventArgs
 	}{
@@ -132,6 +134,8 @@ func TestTripEventHandler(t *testing.T) {
 		},
 	}
 
+	// Register `testEventHandler` one time for the entire test case, akin to how packages are initialized exactly
+	// once at load time.
 	teh := &testEventHandler{}
 	eventhandler.RegisterEventHandler(testEventType, teh)
 
@@ -140,14 +144,17 @@ func TestTripEventHandler(t *testing.T) {
 			teh.setup(tc.handleShouldReturnError)
 			defer teh.teardown()
 
-			inputC := make(chan *input.EventEnvelope, len(tc.input))
+			// Load `eventC` up with all the intended `input.EventEnvelope`s up-front to avoid any unnecessarily-distracting
+			// concurrency primitives in test code.
+			eventC := make(chan *input.EventEnvelope, len(tc.input))
 			for _, eventEnvelope := range tc.input {
-				inputC <- eventEnvelope
+				eventC <- eventEnvelope
 			}
-			close(inputC)
+			close(eventC)
 
+			// Record the `error`s emitted by `Process`() to make the test easier to debug.
 			actualErrors := make([]error, 0)
-			for err := range eventprocessor.New().Process(inputC, eventstore.New()) {
+			for err := range eventprocessor.New().Process(eventC, eventstore.New()) {
 				actualErrors = append(actualErrors, err)
 			}
 
@@ -156,6 +163,10 @@ func TestTripEventHandler(t *testing.T) {
 					tc.numExpectedErrors, len(actualErrors), actualErrors)
 			}
 
+			// Compare the invocations of `testEventHandler` to avoid having to peer deeper into the workings of
+			// `eventhandler.Interface` (by inspecting what it stored in `eventstore.EventStore`) -- that level of
+			// invasive testing is better-suited for the unit tests of the `eventhandler` package itself (where
+			// such an inspection would not be considered invasive).
 			actualOutput := teh.recordedEventArgs
 			if !reflect.DeepEqual(actualOutput, tc.expectedOutput) {
 				t.Fatalf("expected: %#v, got: %#v", tc.expectedOutput, actualOutput)
